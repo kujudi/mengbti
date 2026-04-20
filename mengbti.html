@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万一我是蒙古人呢……？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #faf8f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 起始页 */
+        .start-page {
+            padding: 60px 20px;
+        }
+
+        .main-title {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .sub-text {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            line-height: 2;
+            margin-bottom: 50px;
+        }
+
+        .sub-text p {
+            margin: 8px 0;
+        }
+
+        .detect-btn {
+            display: inline-block;
+            padding: 18px 60px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .detect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(231, 76, 60, 0.4);
+            background: #c0392b;
+        }
+
+        /* 问题页 */
+        .question-page {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #e74c3c;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .question-number {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 20px 25px;
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            font-size: 1.1em;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            padding-left: 55px;
+        }
+
+        .option-btn::before {
+            content: attr(data-option);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+            transform: translateX(5px);
+        }
+
+        .option-btn:hover::before {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* 结果页 */
+        .result-page {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .result-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bdc3c7;
+            font-size: 3em;
+            overflow: hidden;
+        }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .result-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .result-desc {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .share-section {
+            margin-bottom: 20px;
+        }
+
+        .share-url {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            color: #7f8c8d;
+        }
+
+        .share-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            background: #34495e;
+        }
+
+        .restart-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            border: 2px solid #ecf0f1;
+            color: #7f8c8d;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 1.8em; }
+            .sub-text { font-size: 1em; }
+            .question-text { font-size: 1.2em; }
+            .question-page, .result-page { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 起始页 -->
+        <div class="page active" id="page-start">
+            <div class="start-page">
+                <h1 class="main-title">万一我是蒙古人呢……？</h1>
+                <div class="sub-text">
+                    <p>也许我是蒙古人但忘了来处。</p>
+                    <p>也许真正的蒙古人是一路陪我们走来的朋友。</p>
+                </div>
+                  <p style="color: #999; font-size: 0.95em; margin-bottom: 20px;">用30秒检测我是不是蒙古人</p>
+                <button class="detect-btn" onclick="startTest()">检测！</button>
+            </div>
+        </div>
+
+        <!-- 问题页 -->
+        <div class="page" id="page-question">
+            <div class="question-page">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="question-number" id="question-number">问题 1/4</div>
+                <h2 class="question-text" id="question-text"></h2>
+                <div class="options" id="options-container"></div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div class="page" id="page-result">
+            <div class="result-page">
+                <div class="result-image" id="result-image">📷</div>
+                <h2 class="result-title" id="result-title"></h2>
+                <p class="result-subtitle" id="result-subtitle"></p>
+                <div class="result-desc" id="result-desc"></div>
+                
+                <div class="share-section">
+                    <input type="text" class="share-url" id="share-url" readonly>
+                    <br>
+                    <button class="share-btn" onclick="copyLink()">复制链接</button>
+                </div>
+                
+                <button class="restart-btn" onclick="restart()">再测一次</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 题目数据
+        const questions = [
+            {
+                id: 1,
+                text: "你是蒙古人吗",
+                options: [
+                    { text: "是", value: "A" },
+                    { text: "是也许不是", value: "B" },
+                    { text: "不是", value: "C" }
+                ]
+            },
+            {
+                id: 2,
+                text: "你喜欢扭三吗？",
+                options: [
+                    { text: "我做了200集视频批判扭三", value: "A" },
+                    { text: "喜欢某些部分", value: "B" },
+                    { text: "不喜欢", value: "C" }
+                ]
+            },
+            {
+                id: 3,
+                text: "偏头痛袭来，吃了布洛芬不起效，你会？",
+                options: [
+                    { text: "加量，直到疼痛消失", value: "A" },
+                    { text: "只有风暴能击倒大树", value: "B" },
+                    { text: "一直哭", value: "C" }
+                ]
+            },
+            {
+                id: 4,
+                text: "遇到人问路说的话你听不懂，你会?",
+                options: [
+                    { text: "人讲人的，我讲我的", value: "A" },
+                    { text: "借助一切手段比如翻译软件，尽力交流", value: "B" },
+                    { text: "不搭理", value: "C" }
+                ]
+            }
+        ];
+
+        // 结果数据
+        const results = {
+            "蒙古人": {
+                title: "蒙古人",
+                subtitle: "草原的儿女",
+                desc: "你是蒙古人。蒙古人用蒙古方式看待世界，时而聚居时而独居。靠近蒙古人群体常常会听到\"我蒙古了\"的声音。"
+            },
+            "上帝之鞭": {
+                title: "上帝之鞭",
+                subtitle: "神圣性的蒙古人",
+                desc: "因为强大得到了神圣性的蒙古人。大沙暴一般扫平了四周，但你抽打地球的时候，地球也在抽打你。"
+            },
+            "蒙古海军": {
+                title: "蒙古海军",
+                subtitle: "像梦一样的日子",
+                desc: "蒙古海军兴盛在蒙古有海的时候。那时候你们在海里游动，挥斥鞭毛，畅饮海水里的有机碎屑。像梦一样的日子。"
+            },
+            "蒙古大夫": {
+                title: "蒙古大夫",
+                subtitle: "自信而周到",
+                desc: "自信而周到，总能找到办法。被你治过的人没有一个复发的。"
+            },
+            "别人": {
+                title: "别人",
+                subtitle: "你不是蒙古人",
+                desc: "你不是蒙古人。也许蒙古人的喜乐也是你的喜乐，蒙古人的悲伤也是你的悲伤，一条江水从西到东流下，你与蒙古人共饮一江水。只是你不在蒙古。"
+            },
+            "折棒": {
+                title: "折棒",
+                subtitle: "内蒙古人也是蒙古人",
+                desc: "你是折棒，内蒙古人也是蒙古人。"
+            },
+            "狼人": {
+                title: "狼人",
+                subtitle: "被狼养大的蒙古人",
+                desc: "你是狼人，被狼养大的蒙古人，常常在草原上相互追逐。用嘴筒子含住对方表示亲近。"
+            },
+            "中学生": {
+                title: "中学生",
+                subtitle: "蒙古中学生",
+                desc: "你是蒙古中学生。是的，你骑马上学，是乌兰巴托汉语桥大赛冠军。"
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = {}; // 存储每道题的答案
+
+        // 检查URL参数
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const result = params.get('result');
+            if (result && results[result]) {
+                showResult(result);
+                return true;
+            }
+            return false;
+        }
+
+        // 开始测试
+        function startTest() {
+            document.getElementById('page-start').classList.remove('active');
+            document.getElementById('page-question').classList.add('active');
+            showQuestion(0);
+        }
+
+        // 显示问题
+        function showQuestion(index) {
+            currentQuestion = index;
+            const q = questions[index];
+            
+            document.getElementById('question-number').textContent = `问题 ${index + 1}/${questions.length}`;
+            document.getElementById('question-text').textContent = q.text;
+            document.getElementById('progress-fill').style.width = `${(index / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.setAttribute('data-option', String.fromCharCode(65 + i));
+                btn.textContent = opt.text;
+                btn.onclick = () => selectOption(opt.value);
+                container.appendChild(btn);
+            });
+        }
+
+        // 选择选项
+        function selectOption(value) {
+            answers[currentQuestion + 1] = value; // 记录答案（题号从1开始）
+            
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                calculateResult();
+            }
+        }
+
+        // 计算结果（按优先级分支）
+        function calculateResult() {
+            const q1 = answers[1]; // 你是蒙古人吗
+            const q2 = answers[2]; // 你喜欢扭三吗
+            const q3 = answers[3]; // 偏头痛
+            const q4 = answers[4]; // 问路
+
+            let result = "蒙古人"; // 默认
+
+            // 优先级1：第一题选C → 别人（阻断后续）
+            if (q1 === "C") {
+                result = "别人";
+            }
+            // 优先级2：第二题选A → 折棒
+            else if (q2 === "A") {
+                result = "折棒";
+            }
+            // 优先级3：第三题选B → 上帝之鞭
+            else if (q3 === "B") {
+                result = "上帝之鞭";
+            }
+            // 优先级4：第三题选C → 蒙古海军
+            else if (q3 === "C") {
+                result = "蒙古海军";
+            }
+            // 优先级5：第三题选A → 蒙古大夫
+            else if (q3 === "A") {
+                result = "蒙古大夫";
+            }
+            // 优先级6：第四题选A → 狼人
+            else if (q4 === "A") {
+                result = "狼人";
+            }
+            // 优先级7：第四题选B → 中学生
+            else if (q4 === "B") {
+                result = "中学生";
+            }
+            // 默认：蒙古人
+
+            showResult(result);
+        }
+
+        // 显示结果
+        function showResult(resultKey) {
+            document.getElementById('page-question').classList.remove('active');
+            document.getElementById('page-result').classList.add('active');
+            
+            const r = results[resultKey];
+            document.getElementById('result-title').textContent = r.title;
+            document.getElementById('result-subtitle').textContent = r.subtitle;
+            document.getElementById('result-desc').textContent = r.desc;
+            
+            // 生成分享链接
+            const url = new URL(window.location.href);
+            url.searchParams.set('result', resultKey);
+            document.getElementById('share-url').value = url.toString();
+        }
+
+        // 复制链接
+        function copyLink() {
+            const input = document.getElementById('share-url');
+            input.select();
+            document.execCommand('copy');
+            alert('链接已复制！快去分享给朋友吧！');
+        }
+
+        // 重新开始
+        function restart() {
+            answers = {};
+            window.history.replaceState({}, '', window.location.pathname);
+            document.getElementById('page-result').classList.remove('active');
+            document.getElementById('page-start').classList.add('active');
+        }
+
+        // 页面加载
+        window.onload = function() {
+            if (!checkUrlParams()) {
+                document.getElementById('page-start').classList.add('active');
+            }
+        };
+    </script>
+</body>
+</html>
