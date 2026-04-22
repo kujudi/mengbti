@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万一我是蒙古人呢……？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #faf8f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 起始页 */
+        .start-page {
+            padding: 60px 20px;
+        }
+
+        .main-title {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .sub-text {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            line-height: 2;
+            margin-bottom: 50px;
+        }
+
+        .sub-text p {
+            margin: 8px 0;
+        }
+
+        /* 3. 核心：修改检测按钮（增加底纹和蓝色） */
+.detect-btn {
+    display: inline-block;
+    padding: 18px 60px;
+    /* 增加底纹：这里使用了简单的线性重复纹理 */
+    background-color: #2980b9;
+    background-image: 
+    linear-gradient(30deg, #2471a3 12%, transparent 12.5%, transparent 87%, #2471a3 87.5%, #2471a3),
+    linear-gradient(150deg, #2471a3 12%, transparent 12.5%, transparent 87%, #2471a3 87.5%, #2471a3),
+    linear-gradient(30deg, #2471a3 12%, transparent 12.5%, transparent 87%, #2471a3 87.5%, #2471a3),
+    linear-gradient(150deg, #2471a3 12%, transparent 12.5%, transparent 87%, #2471a3 87.5%, #2471a3),
+    linear-gradient(60deg, #2e86c1 25%, transparent 25.5%, transparent 75%, #2e86c1 75.5%, #2e86c1),
+    linear-gradient(60deg, #2e86c1 25%, transparent 25.5%, transparent 75%, #2e86c1 75.5%, #2e86c1);
+background-size: 20px 35px;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.3em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3); /* 阴影也改为蓝色 */
+    letter-spacing: 2px;
+
+    /* 添加深蓝色边框 */
+    border: 3px solid #1a5276; 
+    
+    border-radius: 50px;
+    font-size: 1.3em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+    letter-spacing: 2px;
+}
+
+/* 悬停时的边框效果 */
+.detect-btn:hover {
+    transform: translateY(-3px);
+    background-color: #3498db;
+    border-color: #154360; /* 悬停时边框颜色也加深一点 */
+    box-shadow: 0 6px 25px rgba(41, 128, 185, 0.4);
+}
+
+        .detect-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(41, 128, 185, 0.4);
+    background-color: #3498db; /* 悬停时稍微变亮 */
+}
+
+        /* 问题页 */
+        .question-page {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        /* 1. 修改进度条颜色 */
+.progress-fill {
+    height: 100%;
+    background: #2980b9; /* 改为蓝色 */
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+        /* 2. 修改问题编号颜色 */
+.question-number {
+    color: #2980b9; /* 改为蓝色 */
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+        .question-text {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 20px 25px;
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            font-size: 1.1em;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            padding-left: 55px;
+        }
+
+        .option-btn::before {
+            content: attr(data-option);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+
+        /* 4. 修改选项按钮的悬停颜色 */
+.option-btn:hover {
+    border-color: #2980b9;
+    background: #f2f7fd; /* 浅蓝色背景 */
+    transform: translateX(5px);
+}
+
+.option-btn:hover::before {
+    background: #2980b9;
+    color: white;
+}
+
+        /* 结果页 */
+        .result-page {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        /* 结果页图片框修改：方形、圆角、更大面积 */
+.result-image {
+    width: 280px;        /* 宽度从 200px 增加到 280px */
+    height: 280px;       /* 高度从 200px 增加到 280px */
+    margin: 0 auto 30px;
+    background: #f8f9fa;
+    border-radius: 15px; /* 这里控制圆角，数值越小越方，15px 是微圆角 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bdc3c7;
+    font-size: 3em;
+    overflow: hidden;    /* 必须保留，确保图片超出部分被裁切掉 */
+    border: 2px solid #ecf0f1; /* 可选：给边框加一层浅色的框线，更有质感 */
+}
+
+/* 确保图片填满这个新的大框 */
+.result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .result-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .result-desc {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+/* 按钮容器：强制垂直排列并居中 */
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+        /* 分享按钮样式 */
+.share-btn {
+    display: inline-block;
+    padding: 12px 40px;
+    background: #2980b9; /* 主色调蓝色 */
+    color: white;
+    border: 2px solid #1a5276; /* 深蓝色边框 */
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px; /* 与下方按钮的间距 */
+    transition: all 0.3s;
+}
+
+/* 分享按钮 */
+.share-btn {
+    display: inline-block;
+    width: 220px; /* 统一宽度更美观 */
+    padding: 12px 0;
+    background: #2980b9;
+    color: white;
+    border: 2px solid #1a5276;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.share-btn:hover {
+    background: #3498db;
+    transform: translateY(-2px);
+}
+
+/* 重新开始按钮 */
+.restart-btn {
+    display: inline-block;
+    width: 220px; /* 保持与分享按钮一致 */
+    padding: 12px 0;
+    background: white;
+    border: 2px solid #ecf0f1;
+    color: #7f8c8d;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 0; /* 清除之前的 margin-top */
+    transition: all 0.3s;
+}
+
+.restart-btn:hover {
+    border-color: #2980b9;
+    color: #2980b9;
+}
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 1.8em; }
+            .sub-text { font-size: 1em; }
+            .question-text { font-size: 1.2em; }
+            .question-page, .result-page { padding: 25px; }
+        }
+
+        /* 结果页底部文字样式 */
+.footer-note {
+    margin-top: 40px;      /* 与上方按钮保持距离 */
+    padding-top: 20px;
+    border-top: 1px solid #eee; /* 添加一条很浅的分割线 */
+    color: #bdc3c7;        /* 浅灰色文字 */
+    font-size: 0.85em;     /* 字号缩小 */
+    line-height: 1.6;      /* 行间距 */
+    text-align: center;    /* 居中 */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 起始页 -->
+        <div class="page active" id="page-start">
+            <div class="start-page">
+                <h1 class="main-title">万一我是蒙古人呢……？</h1>
+                <div class="sub-text">
+                    <p>也许我忘记了自己是蒙古人。</p>
+                    <p>也许真正的蒙古人是一路陪我们走来的朋友。</p>
+                </div>
+                  <p style="color: #999; font-size: 0.95em; margin: 80px 0 20px 0;">用30秒检测我是不是蒙古人</p>
+                <button class="detect-btn" type="button" onclick="startTest()">检测！</button>
+            </div>
+        </div>
+
+        <!-- 问题页 -->
+        <div class="page" id="page-question">
+            <div class="question-page">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="question-number" id="question-number">问题 1/5</div>
+                <h2 class="question-text" id="question-text"></h2>
+                <div class="options" id="options-container"></div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div class="page" id="page-result">
+    <div class="result-page">
+        <div class="result-image" id="result-image">📷</div>
+        <h2 class="result-title" id="result-title"></h2>
+        <p class="result-subtitle" id="result-subtitle"></p>
+        <div class="result-desc" id="result-desc"></div>
+        
+        <div class="result-actions">
+            <button class="share-btn" onclick="copyUrl()">分享测试</button>
+            <button class="restart-btn" onclick="restart()">再测一次</button>
+        </div>
+
+        <div class="footer-note">
+            代码由 Gemini 和 Kimi 协作完成，文本由智人生成。<br>
+            图片来自 IRASUTOYA 公共素材经智人处理。
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 题目数据
+        const questions = [
+            {
+                id: 1,
+                text: "你是蒙古人吗",
+                options: [
+                    { text: "是", value: "A" },
+                    { text: "是也许不是", value: "B" },
+                    { text: "不是", value: "C" }
+                ]
+            },
+            {
+                id: 2,
+                text: "你喜欢扭三吗？",
+                options: [
+                    { text: "我做了200集视频批判扭三", value: "A" },
+                    { text: "喜欢某些部分", value: "B" },
+                    { text: "不喜欢", value: "C" }
+                ]
+            },
+            {
+                id: 3,
+                text: "在大型聚会上，你会？",
+                options: [
+                    { text: "勉力偷吃场地提供的餐品", value: "A" },
+                    { text: "游刃有余地穿行", value: "B" },
+                    { text: "观察环境，不主动不拒绝", value: "C" }
+                ]
+            },
+            {
+                id: 4,
+                text: "偏头痛袭来，吃了布洛芬不起效，你会？",
+                options: [
+                    { text: "加量，直到疼痛消失", value: "A" },
+                    { text: "只有风暴能击倒大树", value: "B" },
+                    { text: "等它过去", value: "C" }
+                ]
+            },
+            {
+                id: 5,
+                text: "遇到人问路说的话你听不懂，你会?",
+                options: [
+                    { text: "人讲人的，我讲我的", value: "A" },
+                    { text: "借助一切手段比如翻译软件，尽力交流", value: "B" },
+                    { text: "不搭理", value: "C" }
+                ]
+            }
+        ];
+
+        // 结果数据
+        const results = {
+            "蒙古人": {
+                title: "蒙古人",
+                subtitle: "0.043%的少数人",
+                desc: "你是蒙古人。蒙古人用蒙古方式看待世界，时而聚居时而独居。靠近蒙古人群体常常会听到「我蒙古了」的声音。",
+                image: "assets/music_batoukin_man.png" // 这里替换成你的图片路径
+    
+            },
+            "上帝之鞭": {
+                title: "上帝之鞭",
+                subtitle: "神圣性的蒙古人",
+                desc: "因为强大得到了神圣性的蒙古人。大沙暴一般扫平了四周，但你抽打地球的时候，地球也在抽打你。",
+                image: "assets/nigaoe_fubiraihan.png"
+            },
+            "蒙古海军": {
+                title: "蒙古海军",
+                subtitle: "梦一样的日子",
+                desc: "蒙古海军兴盛在蒙古有海的时候。那时候你们在海里游动，挥斥鞭毛，畅饮海水里的有机碎屑。像梦一样的日子。",
+                image: "assets/space_uchusen_bokan_bg.png"
+            },
+            "蒙古大夫": {
+                title: "蒙古大夫",
+                subtitle: "自信而周到",
+                desc: "自信而周到，总能找到办法。不知怎么的，经过你手的人没有回来第二次的。",
+                image: "assets/hyoujou_doctor_phone_man4_laugh.png"
+            },
+            "别人": {
+                title: "别人",
+                subtitle: "你不是蒙古人",
+                desc: "你不是蒙古人，你们在世界各地广泛分布。一条江水贯穿东西，蒙古人在那头，你在这头，你与蒙古人共饮一江水。只是你不在蒙古。",
+                image: "assets/akusyu_uchuujin.png"
+            },
+            "折棒": {
+                title: "吃蛋挞的折棒",
+                subtitle: "内蒙古人也是蒙古人",
+                desc: "你是折棒，内蒙古人也是蒙古人。",
+                image: "assets/zhebang.png"
+            },
+            "狼人": {
+                title: "狼人",
+                subtitle: "被狼养大的蒙古人",
+                desc: "你是狼人，被狼养大的蒙古人，常常在草原上相互追逐。用嘴筒子含住对方表示亲近。",
+                image: "assets/dog_belgian_groenendael.png"
+            },
+            "中学生": {
+                title: "中学生",
+                subtitle: "蒙古中学生",
+                desc: "你是蒙古中学生。是的，你骑马上学，是乌兰巴托汉语桥大赛冠军。",
+                image: "assets/mongol_yubokumin.png"
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = {}; // 存储每道题的答案
+
+        // 开始测试
+        function startTest() {
+            document.getElementById('page-start').classList.remove('active');
+            document.getElementById('page-question').classList.add('active');
+            showQuestion(0);
+        }
+
+        // 显示问题
+        function showQuestion(index) {
+            currentQuestion = index;
+            const q = questions[index];
+
+            document.getElementById('question-number').textContent = `问题 ${index + 1}/${questions.length}`;
+            document.getElementById('question-text').textContent = q.text;
+            document.getElementById('progress-fill').style.width = `${(index / questions.length) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.setAttribute('data-option', String.fromCharCode(65 + i));
+                btn.textContent = opt.text;
+                btn.onclick = () => selectOption(opt.value);
+                container.appendChild(btn);
+            });
+        }
+
+        // 选择选项
+        function selectOption(value) {
+            answers[currentQuestion + 1] = value; // 记录答案（题号从1开始）
+
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                calculateResult();
+            }
+        }
+
+        // 计算结果
+        // 计算结果
+        function calculateResult() {
+            const q1 = answers[1];
+            const q2 = answers[2];
+            const q3 = answers[3];
+            const q4 = answers[4];
+            const q5 = answers[5];
+
+            let result = "蒙古人";
+
+            // 1. 最高优先级判定
+            if (q1 === "C") {
+                result = "别人";
+            }
+            else if (q2 === "A") {
+                result = "折棒";
+            }
+            // 2. 分支路径逻辑
+            else if (q3 === "A") {
+                if (q5 === "A") result = "狼人";
+                else if (q5 === "B") result = "蒙古人";
+                else if (q5 === "C") result = "蒙古海军";
+            }
+            else if (q3 === "B" || q3 === "C") {
+                if (q4 === "A") result = "蒙古大夫";
+                else if (q4 === "B") result = "上帝之鞭";
+                else if (q4 === "C") result = "中学生";
+            }
+
+            // 3. 动态概率逻辑替换
+            const replaceable = ["上帝之鞭", "蒙古海军", "蒙古大夫", "狼人", "中学生"];
+            
+            if (replaceable.includes(result)) {
+                // 根据第一题的选择决定概率
+                let chance = (q1 === "A") ? (1/3) : (1/6);
+                
+                if (Math.random() < chance) {
+                    result = "蒙古人";
+                }
+            }
+
+            showResult(result);
+        }
+
+        // 显示结果
+        function showResult(resultKey) {
+            document.getElementById('page-question').classList.remove('active');
+            document.getElementById('page-result').classList.add('active');
+
+            const r = results[resultKey];
+            document.getElementById('result-title').textContent = r.title;
+            document.getElementById('result-subtitle').textContent = r.subtitle;
+            document.getElementById('result-desc').textContent = r.desc;
+        // --- 新增下面这行代码 ---
+            document.getElementById('result-image').innerHTML = `<img src="${r.image}" alt="${r.title}">`;
+}
+        
+
+        // 重新开始
+        function restart() {
+            answers = {};
+            document.getElementById('page-result').classList.remove('active');
+            document.getElementById('page-start').classList.add('active');
+        }
+
+        // 点击自动复制网址的函数
+function copyUrl() {
+    // 获取当前网页的地址
+    const url = window.location.href;
+    
+    // 使用现代浏览器通用的剪贴板 API
+    navigator.clipboard.writeText(url).then(() => {
+        // 复制成功后的提示
+        alert("网址已复制！去检测你身边的蒙古人！");
+    }).catch(err => {
+        // 如果出错的备用方案
+        console.error('复制失败: ', err);
+        alert("复制失败，请手动复制浏览器地址栏网址");
+    });
+}
+    </script>
+</body>
+</html>
